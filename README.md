@@ -28,7 +28,7 @@ to any problem kindy contact me: Irani.gholamali@gmail.com
 
 1- Install PostgreSQL 14 or above from (https://www.enterprisedb.com/downloads/postgres-postgresql-downloads).
 
-2- Download JavaParser or Tomcat databaase Backup file from https://github.com/gClassAcademy/Sahand2/blob/main/gVal/src/main/resources/
+2- Download JavaParser or Tomcat databaase Backup file https://github.com/gClassAcademy/Sahand2/blob/main/gVal/src/main/resources/
 
 3- Restore database backup file (JavaParser or Tomcat) into installed PostgreSQL. 
     Backup tutorial  is here: https://www.pgsclusters.com/docs/postgresql/Backing%20up%20and%20Restoring%20a%20Single%20Database%20via%20pgAdmin41605777509.html
