@@ -1,14 +1,14 @@
 # Sahand2 
 An update to Sahand project that calculates Importance of 4 elements: 
 
-1- Importance of all Attributes of Classes,
+**1- Importance of all Attributes of Classes,
 
 2- Importance of all Methods of classes 
 
 3- Importance of all access to attributes by any methods,
 
 4- Importance of all method calls,
-
+**
 
 of any given class in a Java Projects
 
