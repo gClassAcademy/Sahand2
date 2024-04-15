@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.ArrayAccessExpr;
@@ -19,7 +20,6 @@ import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
-import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 
 import Data.Point;
@@ -59,16 +59,20 @@ public class Importance {
             		        	Writefields.add(((FieldAccessExpr)node1).getNameAsString());
             		        else 
             		        {	
-            		        	//System.out.println("###" + ((FieldAccessExpr)node1).getChildNodes().get(0).toString());
-            		        	NameExpr node2 = (NameExpr) ((FieldAccessExpr)node1).getChildNodes().get(0);
                 		        try
-	                	        {
-	                	            ResolvedValueDeclaration decl = ((NameExpr)node2).resolve();
-	                	            
-	                	            if(decl.isField())
-	                	            	Writefields.add(((NameExpr)node2).getNameAsString());
+	                	        {                		        	
+                		        	Node nndd=((FieldAccessExpr)node1).getChildNodes().get(0);
+                		        	//NameExpr node2 = (NameExpr)((FieldAccessExpr)node1).getChildNodes().get(0);
+                		        	if (nndd instanceof NameExpr)
+                		        	{
+                		        		NameExpr node2 = (NameExpr)nndd;
+                		        	
+                		        		ResolvedValueDeclaration decl = ((NameExpr)node2).resolve();    	                	            
+                		        		if(decl.isField())
+                		        			Writefields.add(((NameExpr)node2).getNameAsString());
+                		        	}                		        
 	                	        }
-	                	        catch(UnsolvedSymbolException e)
+	                	        catch(Exception e)
 	                	        {
 	                	        } 
 
@@ -82,22 +86,25 @@ public class Importance {
                 	            if(decl.isField())
                 	            	Writefields.add(((NameExpr)node1).getNameAsString());
                 	        }
-                	        catch(UnsolvedSymbolException e)
+                	        catch(Exception e)
                 	        {
                 	        } 
             			else if (node1 instanceof ArrayAccessExpr)
             			{
-            				//System.out.println("arr: " + ((ArrayAccessExpr) node1).getName().toString());
-            				NameExpr node2 = (NameExpr) ((ArrayAccessExpr) node1).getName();
-
             		        try
                 	        {
-                	            ResolvedValueDeclaration decl = ((NameExpr)node2).resolve();
+            		        	Node nndd = ((ArrayAccessExpr) node1).getName();
+            		        	if (nndd instanceof NameExpr)
+            		        	{
+            		        		NameExpr node2 = (NameExpr) nndd;
+
+            		        		ResolvedValueDeclaration decl = ((NameExpr)node2).resolve();
                 	            
-                	            if(decl.isField())
-                	            	Writefields.add(((NameExpr)node2).getNameAsString());
+            		        		if(decl.isField())
+            		        			Writefields.add(((NameExpr)node2).getNameAsString());
+            		        	}
                 	        }
-                	        catch(UnsolvedSymbolException e)
+                	        catch(Exception e)
                 	        {
                 	        } 
 
@@ -114,12 +121,13 @@ public class Importance {
         			else if(node instanceof NameExpr)
         		        try
             	        {
-            	            ResolvedValueDeclaration decl = ((NameExpr)node).resolve();
+        		        	NameExpr ne = (NameExpr)node;
+            	            ResolvedValueDeclaration decl = ne.resolve();
             	            
             	            if(decl.isField())
-            	                fields.add(((NameExpr)node).getNameAsString());
+            	                fields.add(ne.getNameAsString());
             	        }
-            	        catch(UnsolvedSymbolException e)
+            	        catch(Exception e)
             	        {
             	        }
         		});
@@ -303,15 +311,20 @@ public class Importance {
                 		        else 
                 		        {	
                 		        	//System.out.println("###" + ((FieldAccessExpr)node1).getChildNodes().get(0).toString());
-                		        	NameExpr node2 = (NameExpr) ((FieldAccessExpr)node1).getChildNodes().get(0);
                     		        try
     	                	        {
-    	                	            ResolvedValueDeclaration decl = ((NameExpr)node2).resolve();
-    	                	            
-    	                	            if(decl.isField())
-    	                	            	Writefields.add(((NameExpr)node2).getNameAsString());
+                    		        	Node nndd=((FieldAccessExpr)node1).getChildNodes().get(0);
+                    		        	//NameExpr node2 = (NameExpr)((FieldAccessExpr)node1).getChildNodes().get(0);
+                    		        	if (nndd instanceof NameExpr)
+                    		        	{
+                    		        		NameExpr node2 = (NameExpr)nndd;
+                    		        	
+                    		        		ResolvedValueDeclaration decl = ((NameExpr)node2).resolve();    	                	            
+                    		        		if(decl.isField())
+                    		        			Writefields.add(((NameExpr)node2).getNameAsString());
+                    		        	}
     	                	        }
-    	                	        catch(UnsolvedSymbolException e)
+    	                	        catch(Exception e)
     	                	        {
     	                	        } 
 
@@ -325,22 +338,21 @@ public class Importance {
 	                	            if(decl.isField())
 	                	            	Writefields.add(((NameExpr)node1).getNameAsString());
 	                	        }
-	                	        catch(UnsolvedSymbolException e)
+	                	        catch(Exception e)
 	                	        {
 	                	        } 
                 			else if (node1 instanceof ArrayAccessExpr)
                 			{
                 				//System.out.println("arr: " + ((ArrayAccessExpr) node1).getName().toString());
-                				NameExpr node2 = (NameExpr) ((ArrayAccessExpr) node1).getName();
-
                 		        try
 	                	        {
+                    				NameExpr node2 = (NameExpr) ((ArrayAccessExpr) node1).getName();
 	                	            ResolvedValueDeclaration decl = ((NameExpr)node2).resolve();
 	                	            
 	                	            if(decl.isField())
 	                	            	Writefields.add(((NameExpr)node2).getNameAsString());
 	                	        }
-	                	        catch(UnsolvedSymbolException e)
+	                	        catch(Exception e)
 	                	        {
 	                	        } 
 
@@ -362,7 +374,7 @@ public class Importance {
                 	            if(decl.isField())
                 	                fields.add(((NameExpr)node).getNameAsString());
                 	        }
-                	        catch(UnsolvedSymbolException e)
+                	        catch(Exception e)
                 	        {
                 	        }
             		});
@@ -513,18 +525,6 @@ public class Importance {
 		return (float)(sum + 0.8235 * 1);
 	}
 	
-	
-	
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 } // end of class
