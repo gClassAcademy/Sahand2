@@ -2,7 +2,6 @@ package analyzer.visitors;
 
 import analyzer.AbstractVoidVisitorAdapter;
 import importance.Importance;
-import net.bytebuddy.dynamic.scaffold.MethodGraph.Node;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.javaparser.Range;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -558,15 +558,20 @@ public class gVisitor extends AbstractVoidVisitorAdapter<Classs> {
             		        	saveAA(((FieldAccessExpr)node1).getNameAsString(), cccc, AttributeAccessType.Write, ((FieldAccessExpr)node1).getRange().get());
             		        else 
             		        {	
-            		        	//System.out.println("###" + ((FieldAccessExpr)node1).getChildNodes().get(0).toString());
-            		        	NameExpr node2 = (NameExpr) ((FieldAccessExpr)node1).getChildNodes().get(0);
                 		        try
 	                	        {
-	                	            ResolvedValueDeclaration decl = ((NameExpr)node2).resolve();
-	                	            if(decl.isField())
-	                		        	saveAA(((NameExpr)node2).getNameAsString(), cccc, AttributeAccessType.Write, ((NameExpr)node2).getRange().get());
+                		        	Node nndd=((FieldAccessExpr)node1).getChildNodes().get(0);
+                		        	//NameExpr node2 = (NameExpr)((FieldAccessExpr)node1).getChildNodes().get(0);
+                		        	if (nndd instanceof NameExpr)
+                		        	{
+                		        		NameExpr node2 = (NameExpr)nndd;
+
+                		        		ResolvedValueDeclaration decl = ((NameExpr)node2).resolve();
+                		        		if(decl.isField())
+                		        			saveAA(((NameExpr)node2).getNameAsString(), cccc, AttributeAccessType.Write, ((NameExpr)node2).getRange().get());
+                		        	}
 	                	        }
-	                	        catch(UnsolvedSymbolException e)
+	                	        catch(Exception e)
 	                	        {
 	                	        } 
 
@@ -579,21 +584,24 @@ public class gVisitor extends AbstractVoidVisitorAdapter<Classs> {
                 	            if(decl.isField())
                 		        	saveAA(((NameExpr)node1).getNameAsString(), cccc, AttributeAccessType.Write, ((NameExpr)node1).getRange().get());
                 	        }
-                	        catch(UnsolvedSymbolException e)
+                	        catch(Exception e)
                 	        {
                 	        } 
             			else if (node1 instanceof ArrayAccessExpr)
             			{
-            				//System.out.println("arr: " + ((ArrayAccessExpr) node1).getName().toString());
-            				NameExpr node2 = (NameExpr) ((ArrayAccessExpr) node1).getName();
-
             		        try
                 	        {
-                	            ResolvedValueDeclaration decl = ((NameExpr)node2).resolve();
-                	            if(decl.isField())
-                		        	saveAA(((NameExpr)node2).getNameAsString(), cccc, AttributeAccessType.Write, ((NameExpr)node2).getRange().get());
+                				Node nndd = ((ArrayAccessExpr) node1).getName();
+                	            if (nndd instanceof NameExpr)
+                				{
+                	            	NameExpr node2 = (NameExpr) nndd;
+                	            	ResolvedValueDeclaration decl = ((NameExpr)node2).resolve();
+                				
+                	            	if(decl.isField())
+                	            		saveAA(((NameExpr)node2).getNameAsString(), cccc, AttributeAccessType.Write, ((NameExpr)node2).getRange().get());
+                				}
                 	        }
-                	        catch(UnsolvedSymbolException e)
+                	        catch(Exception e)
                 	        {
                 	        } 
 
@@ -611,7 +619,7 @@ public class gVisitor extends AbstractVoidVisitorAdapter<Classs> {
             	            if(decl.isField())
             		        	saveAA(((NameExpr)node).getNameAsString(), cccc, AttributeAccessType.Read,((NameExpr)node).getRange().get());
             	        }
-            	        catch(UnsolvedSymbolException e)
+            	        catch(Exception e)
             	        {
             	        }
             		}); // end of if walk
