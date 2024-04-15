@@ -1,0 +1,11 @@
+select *,numerator::float/denominator as LCOM4
+from (
+		SELECT c.id, c.name, 
+			   COUNT(DISTINCT CASE WHEN mi.targetid IS NOT NULL THEN m1.id END) AS numerator,
+			   COUNT(DISTINCT m1.id) AS denominator
+		FROM class c
+		JOIN method m1 ON c.id = m1.classid
+		LEFT JOIN methodinvocation mi ON m1.id = mi.sourceid
+		GROUP BY c.id
+		order by numerator, denominator
+) a order by LCOM4
