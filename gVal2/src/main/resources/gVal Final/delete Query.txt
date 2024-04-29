@@ -1,0 +1,77 @@
+delete from loopstatement;
+delete from attributeaccess;
+delete from methodinvocation;
+delete from inputparameter;
+delete from "method";
+delete from "attribute";
+delete from inheritance;
+delete from "class";
+delete from package;
+delete from project;
+
+
+update attributeaccess aa
+set importance = m.importance*a.importance
+--select aa.id, m.name, m.importance,a.name , a.importance, (m.importance*a.importance) as aaImportance
+ from method m , "attribute" a
+ where (aa.methodid is not null and aa.attributeid is not null and aa.methodid=m.id and aa.attributeid=a.id)
+ --order by aaImportance desc
+ 
+
+
+
+
+
+	select mi.id, mi.sourceid, mi.targetid ,mi."name", c.id as sourceclassid , c2.id as targetclassid 
+	from methodinvocation mi , method m, class c, method m2, class c2
+	where (mi.sourceid = m.id and m.classid = c.id and mi.targetid = m2.id and m2.classid = c2.id and c.id = c2.id)
+	order by mi.id
+
+
+select MAX(XX.maxmi) 
+from (
+	select mi.sourceid, count(*) as maxmi
+	from methodinvocation mi , method m, class c, method m2, class c2
+	where (mi.sourceid = m.id and m.classid = c.id and mi.targetid = m2.id and m2.classid = c2.id and c.id = c2.id)
+	group by mi.sourceid
+	order by maxmi desc
+	) XX
+
+
+
+-- set Call_In column in method table
+UPDATE method 
+SET callin = xxx.callin 
+FROM (
+    SELECT mi.targetid AS targetid, COUNT(*) AS callin
+    FROM methodinvocation mi, method m, class c, method m2, class c2
+    WHERE (mi.sourceid = m.id AND m.classid = c.id AND mi.targetid = m2.id AND m2.classid = c2.id AND c.id = c2.id)
+    GROUP BY mi.targetid
+) AS xxx
+WHERE method.id = xxx.targetid;
+
+
+-- Call Out
+UPDATE method 
+SET callout = xxx.callout 
+FROM (
+	select mi.sourceid as sourceid, count(*) as callout 
+	from methodinvocation mi , method m, class c, method m2, class c2	
+	where (mi.sourceid = m.id and m.classid = c.id and mi.targetid = m2.id and m2.classid = c2.id and c.id = c2.id) 
+	group by mi.sourceid
+) AS xxx
+WHERE method.id = xxx.sourceid;
+
+	
+-- Fan Out
+UPDATE method 
+SET fanout = xxx.fanout 
+FROM (
+	select mi.sourceid as sourceid, count(*) as fanout	
+	from methodinvocation mi 
+	where mi.targetid is null 
+	group by mi.sourceid
+	) AS xxx
+WHERE method.id = xxx.sourceid;
+
+	

@@ -1,0 +1,23 @@
+SELECT
+  c.id,
+  c.name,
+  COUNT(*) AS methods_count,
+  SUM(m.loc * m.cognitivecomplexity) AS WMC
+FROM
+  class c
+LEFT JOIN
+  method m ON c.id = m.classid
+GROUP BY
+  c.id
+order by WMC
+
+
+
+SELECT c.id, c.name, COUNT(*) AS methods_count, SUM(m.loc * m.cognitivecomplexity) AS WMC
+FROM class c 
+LEFT JOIN method m ON c.id = m.classid
+GROUP BY c.id
+order by WMC
+
+
+

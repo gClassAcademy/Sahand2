@@ -1,0 +1,146 @@
+select *, External_Params * Internal_Params as Importance_before_Norm from
+(
+select c.name as class_name, c.loc as class_loc, a.name as attribute_name,a.imp1 as External_Params, a.imp2 as Internal_Params, a.importance, count(aa.id) as Access_Count
+from class c, attribute a , attributeaccess aa
+where c.id=a.classid and a.id=aa.attributeid
+group by c.name, c.loc, a.name, a.importance,a.imp1, a.imp2
+order by a.importance desc
+	) xx
+	
+	order by Importance_before_Norm desc
+
+
+
+
+
+
+ select * from
+
+(select *, External_Params * Internal_Params as Importance_before_Norm from
+	(
+		select c.name as class_name, c.loc as class_loc,a.id, a.name as attribute_name,a.imp1 as External_Params, a.imp2 as Internal_Params, a.importance
+		from class c, attribute a 
+		where c.id=a.classid
+		group by c.name, c.loc,a.id, a.name, a.importance,a.imp1, a.imp2
+		order by a.importance desc
+	) xx	
+	order by importance desc
+ ) bbb left join 
+ (select aa.attributeid, count(aa.attributeid) as attrcount
+  from attributeaccess aa
+  where aa.attributeaccesstype=0
+  group by aa.attributeid
+ ) aaa
+ on bbb.id = aaa.attributeid
+
+
+
+
+select * from
+(
+	select c.id, c.name, c.loc, count(a.id) as att_count, sum(a.importance) as att_imps
+	from class c, attribute a 
+	where (c.id=a.classid and a.isinherited = false) 
+	group by c.id  
+	order by att_imps 
+) xx
+where xx.att_imps<=0.1
+order by xx.att_count desc
+
+
+select * from
+(
+	select c.id, c.name, c.loc, count(a.id) as att_count, sum(a.importance) as att_imps, sum(m.cognitivecomplexity)
+	from class c, attribute a , method m
+	where (c.id=a.classid and a.isinherited = false and c.id=m.classid) 
+	group by c.id  
+	order by att_imps 
+) xx
+where xx.att_imps<=0.1
+order by xx.att_count desc
+
+
+
+
+select c.name , m.name, m.loc, m.cognitivecomplexity, m.imp1, m.imp2, m.importance, m.attrseenr, m.attrseenw 
+from method m, class c
+where c.id=m.classid and m.isinherited = false
+order by m.importance desc
+
+
+
+
+
+
+select c.name ,m.id, m.name, m.loc, m.cognitivecomplexity, m.imp1, m.imp2, m.importance, m.attrseenr, m.attrseenw, count(mi.id) as invocas, sum(mi.importance) as misum
+from method m, class c, methodinvocation mi
+where c.id=m.classid and m.id = mi.sourceid and m.isinherited = false and mi.targetid is not null
+group by c.name ,m.id, m.name, m.loc, m.cognitivecomplexity, m.imp1, m.imp2, m.importance, m.attrseenr, m.attrseenw 
+order by m.cognitivecomplexity desc
+
+
+
+
+select c.id , c.name as classname , count(methodid) as method_Count , c.loc, sum(xx.cognitivecomplexity) as allcomplexity, sum(xx.importance) as allimp, sum(xx.invocations) as allInvocations
+from 
+(
+	select m.id as methodid, m.classid as classid, m.name as methodname,m.loc as methodloc,m.cognitivecomplexity, m.importance, count(mi.id) as invocations
+	from method m left join methodinvocation mi
+	on (m.id = mi.sourceid)
+	group by m.id
+	order by m.importance desc
+) xx , class c
+where xx.classid = c.id
+group by c.id
+order by allimp desc
+
+
+
+
+//update aa
+select aa.id, m.name, m.importance,a.name , a.importance, (m.importance*a.importance) as aaImportance
+ from attributeaccess aa , method m , "attribute" a
+ where (aa.methodid is not null and aa.attributeid is not null and aa.methodid=m.id and aa.attributeid=a.id)
+ order by aaImportance desc
+ 
+
+update attributeaccess aa
+set importance = m.importance*a.importance
+--select aa.id, m.name, m.importance,a.name , a.importance, (m.importance*a.importance) as aaImportance
+ from method m , "attribute" a
+ where (aa.methodid is not null and aa.attributeid is not null and aa.methodid=m.id and aa.attributeid=a.id)
+ --order by aaImportance desc
+ 
+
+
+
+select mi.targetid, count(mi.sourceid) countss, sum(mi.importance) as sumimp
+from methodinvocation mi
+where targetid is not null
+group by mi.targetid
+order by countss  desc
+
+
+
+select m.name as method_name, xx.countss, xx.sumimp
+from
+	(select mi.targetid, count(mi.sourceid) countss, sum(mi.importance) as sumimp
+	from methodinvocation mi
+	where targetid is not null 
+	group by mi.targetid
+	--having sum(mi.importance)<1
+	) xx 
+left join method m
+on m.id = xx.targetid
+order by xx.sumimp desc 
+
+
+
+--select aa.methodid, aa.attributeid, aa.fieldname, aa.importance
+select aa.attributeid, aa.fieldname, count(*), sum(aa.importance)
+from attributeaccess aa
+where attributeid is not null and methodid is not null
+--order by aa.importance desc
+group by aa.attributeid, aa.fieldname
+having sum(aa.importance)<0.01
+order by count(*) desc
