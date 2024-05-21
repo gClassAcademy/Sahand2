@@ -182,17 +182,21 @@ public class Importance {
 		
 		
 		// calculate Non-Access Modifier
+		float sum_non=0;
 		if ((method.getMethodmodifier()) == MethodModifier.Final)
-			sum += 0.9419 * 0.01;
+			sum_non += 0.9419 * 0.01;
 		if ((method.getMethodmodifier()) == MethodModifier.Abstract)
-			sum += 0.9419 * 0.01;
-		if ((method.getMethodmodifier()) == MethodModifier.Default)
-			sum += 0.9419 * 0.4;
+			sum_non += 0.9419 * 0.01;
 		if (method.isIsstatic())
-			sum += 0.9419 * 1;
+			sum_non += 0.9419 * 1;
 		if (method.isIssynchronized())
-			sum += 0.9419 * 1;
+			sum_non += 0.9419 * 1;
 				
+		if (sum_non == 0) //default
+			sum_non += 0.9419 * 0.4;
+		
+		sum += sum_non;
+		
 		
 		// calculate RETURN Data Type Complexity
 		float sum1=0;
@@ -502,18 +506,20 @@ public class Importance {
 		
 		
 		// calculate Non-Access Modifier
+		float sum_non = 0;
 		if ((attribute.getAttributemodifier()) == AttributeModifier.Final)
-			sum += 0.9419 * 0.01;
-		else if ((attribute.getAttributemodifier()) == AttributeModifier.Volitile)
-			sum += 0.9419 * 1;
-		else if ((attribute.getAttributemodifier()) == AttributeModifier.Default)
-			sum += 0.9419 * 0.4;
+			sum_non += 0.9419 * 0.01;
+		if ((attribute.getAttributemodifier()) == AttributeModifier.Volitile)
+			sum_non += 0.9419 * 1;
 		if (attribute.isIsstatic())
-			sum += 0.9419 * 1;
+			sum_non += 0.9419 * 1;
 		if (attribute.isIstransient())
-			sum += 0.9419 * 0.5;
+			sum_non += 0.9419 * 0.5;
 				
+		if (sum_non == 0) //default
+			sum_non += 0.9419 * 0.4;
 		
+		sum += sum_non;
 		// calculate Data Type Complexity
 				
 		if (((attribute.getDatatype()) == DataType.Int)
@@ -540,14 +546,6 @@ public class Importance {
 		// type is other class 
 		return (float)(sum + 0.8235 * 1);
 	}
-	
-	
-	
-
-	
-	
-	
-	
 	
 	
 	
